@@ -17,8 +17,6 @@ if(LIBOMPTARGET_DEP_LIBELF_FOUND)
          if(CMAKE_SYSTEM_PROCESSOR MATCHES "(x86_64)|(ppc64le)$" AND CMAKE_SYSTEM_NAME MATCHES "Linux")
 
             libomptarget_say("Building HSA offloading plugin. ... ")
-            set(LIBOMPTARGET_DEP_HSA_LIBRARIES "/opt/rocm/hsa/lib/libhsa-runtime64.so")
-            set(LIBOMPTARGET_DEP_HSA_INCLUDE_DIRS "/opt/rocm/hsa/include")
 
             # Define the suffix for the runtime messaging dumps.
             add_definitions(-DTARGET_NAME=HSA)
@@ -30,7 +28,9 @@ if(LIBOMPTARGET_DEP_LIBELF_FOUND)
             # Install plugin under the lib destination folder.
             install(TARGETS omptarget.rtl.hsa LIBRARY DESTINATION "lib")
       
-            target_link_libraries(omptarget.rtl.hsa ${LIBOMPTARGET_DEP_HSA_LIBRARIES} hsa 
+            target_link_libraries(omptarget.rtl.hsa 
+               ${LIBOMPTARGET_DEP_HSA_LIBRARIES} 
+               hsa-runtime64 
                ${LIBOMPTARGET_DEP_LIBELF_LIBRARIES}
                "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/../exports"
             )
