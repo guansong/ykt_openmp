@@ -30,7 +30,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
-typedef atomic_int omp_lock_t;      /* arbitrary type of the right length */
+//typedef atomic_int omp_lock_t;      /* arbitrary type of the right length */
+typedef int omp_lock_t;      /* Use cl 1.2 atomic functions on omp_lock_t */
 typedef uint64_t omp_nest_lock_t; /* arbitrary type of the right length */
 
 
@@ -150,12 +151,12 @@ typedef void (* kmp_ReductFctPtr)(void *lhsData, void *rhsData);
 // task defs
 typedef struct kmp_TaskDescr kmp_TaskDescr;
 typedef int32_t (* kmp_TaskFctPtr)(int32_t global_tid, kmp_TaskDescr *taskDescr);
-typedef struct kmp_TaskDescr {
+struct kmp_TaskDescr {
   void          *sharedPointerTable; // ptr to a table of shared var ptrs
   kmp_TaskFctPtr sub;     // task subroutine
   int32_t        partId;  // unused
   kmp_TaskFctPtr destructors; // destructor of c++ first private
-} kmp_TaskDescr;
+} ;
 
 // task dep defs
 #define KMP_TASKDEP_IN  0x1u

@@ -112,6 +112,8 @@ EXTERN int __kmpc_dispatch_next_4(
   PRINT0(LD_IO, "call kmpc_dispatch_next_4\n");
 #if 0
   return <int32_t, int32_t>::dispatch_next(p_last, p_lb, p_ub, p_st);
+#else 
+  return 0;
 #endif
 }
 
@@ -126,6 +128,8 @@ EXTERN int __kmpc_dispatch_next_4u(
   PRINT0(LD_IO, "call kmpc_dispatch_next_4u\n");
 #if 0
   return <uint32_t, int32_t>::dispatch_next(p_last, p_lb, p_ub, p_st);
+#else 
+  return 0;
 #endif
 }
 
@@ -140,6 +144,8 @@ EXTERN int __kmpc_dispatch_next_8(
   PRINT0(LD_IO, "call kmpc_dispatch_next_8\n");
 #if 0
   return <int64_t, int64_t>::dispatch_next(p_last, p_lb, p_ub, p_st);
+#else 
+  return 0;
 #endif
 }
 
@@ -149,6 +155,8 @@ EXTERN int __kmpc_dispatch_next_8u(kmp_Indent * loc, int32_t gtid,
   PRINT0(LD_IO, "call kmpc_dispatch_next_8u\n");
 #if 0
   return <uint64_t, int64_t>::dispatch_next(p_last, p_lb, p_ub, p_st);
+#else 
+  return 0;
 #endif
 }
 

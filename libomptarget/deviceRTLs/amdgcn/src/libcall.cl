@@ -404,7 +404,7 @@ EXTERN int __compare_exchange_int_global(__global omp_lock_t * lock, int * comp,
 
 EXTERN void omp_init_lock(__global omp_lock_t * lock)
 {
-    atomic_store(lock, UNSET);
+    atomic_xchg(lock, UNSET);
     PRINT0(LD_IO, "call omp_init_lock()\n");
 }
 

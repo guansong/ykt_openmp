@@ -126,6 +126,7 @@ mark_as_advanced(
 #  Hardcode HSA support
 set(LIBOMPTARGET_DEP_HSA_LIBRARIES "/opt/rocm/hsa/lib/libhsa-runtime64.so")
 set(LIBOMPTARGET_DEP_HSA_INCLUDE_DIRS "/opt/rocm/hsa/include")
+set(LIBOMPTARGET_AMDGCN_CLOC_COMPILER "cloc.sh")
 
 mark_as_advanced(
   LIBOMPTARGET_DEP_HSA_INCLUDE_DIRS
