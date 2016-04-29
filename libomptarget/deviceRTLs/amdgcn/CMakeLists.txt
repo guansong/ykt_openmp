@@ -34,6 +34,8 @@ if(LIBOMPTARGET_AMDGCN_ALTERNATE_HOST_COMPILER)
       task
   )
 
+  # cmake caller should set LIBOMPTARGET_AMDGCN_COMPUTE_CAPABILITY=`mymcpu` to build for current processor 
+  # but set to fiji otherwise.
   if(LIBOMPTARGET_AMDGCN_COMPUTE_CAPABILITY)
     set(AMDGCN_ARCH ${LIBOMPTARGET_AMDGCN_COMPUTE_CAPABILITY})
   else()
@@ -54,8 +56,8 @@ if(LIBOMPTARGET_AMDGCN_ALTERNATE_HOST_COMPILER)
      )
      add_custom_target(${cn} DEPENDS ${cn}.bc)
   endforeach()
-  add_custom_command(OUTPUT omptarget-amdgcn.bc COMMAND llvm-link ${amdgcn_bc_files} -o omptarget-amdgcn.bc DEPENDS ${amdgcn_components})
-  add_custom_target(omptarget-amdgcn DEPENDS omptarget-amdgcn.bc)
+  add_custom_command(OUTPUT omptarget-amdgcn-${AMDGCN_ARCH}.bc COMMAND llvm-link ${amdgcn_bc_files} -o omptarget-amdgcn.bc DEPENDS ${amdgcn_components})
+  add_custom_target(omptarget-amdgcn DEPENDS omptarget-amdgcn-${AMDGCN_ARCH}.bc)
   add_dependencies(omptarget omptarget-amdgcn)
 
   install(FILES omptarget-amdgcn.bc DESTINATION "lib")
