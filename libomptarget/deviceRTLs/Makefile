@@ -11,7 +11,7 @@
 #
 ##===----------------------------------------------------------------------===##
 
-DEV_RTL_FOLDERS = hsail nvptx
+DEV_RTL_FOLDERS = amdgcn nvptx
 
 all:
 	@for f in $(DEV_RTL_FOLDERS); do \

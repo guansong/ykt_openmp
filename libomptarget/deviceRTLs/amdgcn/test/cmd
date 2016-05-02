@@ -1,0 +1,5 @@
+env AMD_OCL_BUILD_OPTIONS_APPEND="-save-temps-all -cl-std=CL2.0 -I`pwd` -DOMPTARGET_HSAIL_DEBUG=-1" driver
+env AMD_OCL_BUILD_OPTIONS_APPEND="-save-temps-all -cl-std=CL1.2 -I`pwd` -DOMPTARGET_HSAIL_DEBUG=-1" driver
+
+aoc2 -march=hsail-64 -mdevice=Spectre -save-temps-all -cl-std=CL2.0 -I`pwd` -DOMPTARGET_HSAIL_DEBUG=-1 driver.cl
+
