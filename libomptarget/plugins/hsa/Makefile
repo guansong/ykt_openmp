@@ -16,14 +16,23 @@
 
 SHELL := /bin/bash
 
-hsalibs := 
+hsalibs :=
+ifneq ($(wildcard /opt/rocm/lib),)
+  hsalibs += -L /opt/rocm/lib -lhsa-runtime64
+endif
 ifneq ($(wildcard $(HSA_RUNTIME_PATH)/lib),)
-hsalibs += -L $(HSA_RUNTIME_PATH)/lib -lhsa-runtime64
+  hsalibs += -L $(HSA_RUNTIME_PATH)/lib -lhsa-runtime64
 endif
 
-hsaincludes := 
-ifneq ($(wildcard $(HSA_RUNTIME_PATH)/include),)
-hsaincludes += -I $(HSA_RUNTIME_PATH)/include
+hsaincludes :=
+ifneq ($(wildcard /opt/rocm/include/hsa/hsa.h),)
+  hsaincludes += -I /opt/rocm/hsa/include
+endif
+ifneq ($(wildcard $(HSA_RUNTIME_PATH)/include/hsa.h),)
+  hsaincludes += -I $(HSA_RUNTIME_PATH)/include
+endif
+ifneq ($(wildcard $(HSA_RUNTIME_PATH)/include/hsa/hsa.h),)
+  hsaincludes += -I $(HSA_RUNTIME_PATH)/include/hsa
 endif
 
 hsalib := $(findstring hsa, $(shell ldconfig -p | grep 'libhsa' | grep -o '/.*' ))

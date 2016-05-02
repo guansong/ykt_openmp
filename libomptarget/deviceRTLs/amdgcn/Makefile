@@ -16,16 +16,6 @@
 
 SHELL := /bin/bash
 
-hsalibs :=
-ifneq ($(wildcard $(HSA_RUNTIME_PATH)/lib),)
-hsalibs += -L $(HSA_RUNTIME_PATH)/lib -lhsa-runtime64
-endif
-
-hsaincludes :=
-ifneq ($(wildcard $(HSA_RUNTIME_PATH)/include),)
-hsaincludes += -I $(HSA_RUNTIME_PATH)/include
-endif
-
 hsalib := $(findstring hsa, $(shell ldconfig -p | grep 'libhsa' | grep -o '/.*' ))
 
 build_hsa :=
@@ -65,8 +55,15 @@ CLANGFLAGS += -emit-llvm -c
 
 # make sure we use the same llvm from clang
 LLVM-AS := `which clang | sed 's/clang$$/llvm-as/'`
-DIS := llvm-dis
-BCLNK := $(HSA_LLVM_PATH)/llvm-link
+LLVM-DIS := llvm-dis
+
+ifneq ($(wildcard /opt/rocm/hcc-hsail/hlc/bin/llvm-link),)
+BCLNK := /opt/rocm/hcc-hsail/hlc/bin/llvm-link
+endif
+ifneq ($(wildcard $(HSA_HLC_PATH)/llvm-link),)
+BCLNK := $(HSA_HLC_PATH)/llvm-link
+endif
+
 LNKFLAGS :=
 #-suppress-warnings
 
@@ -88,7 +85,7 @@ endif
 
 obj/%.bc: src/%.cl $(INC_FILES)
 	@ mkdir -p obj
-	$(CLANG) $(CLANGFLAGS) $< -o obj/$*.bc
+	#$(CLANG) $(CLANGFLAGS) $< -o obj/$*.bc
 	$(CLC) $(CLCFLAGS) $< -o obj/$*.bc
 	@#$(AOC) $(AOCFLAGS) $< && mv _temp_0_Spectre_original.bc obj/$*.bc && rm _temp_*
 
