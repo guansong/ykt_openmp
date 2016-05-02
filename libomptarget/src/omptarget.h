@@ -154,7 +154,8 @@ int __tgt_target_teams_nowait(int32_t device_id, void *host_ptr,
 #ifdef OMPTARGET_DEBUG
 #define DEBUGP(prefix, ...)                                                    \
   {                                                                            \
-    fprintf(stderr, "%s --> ", prefix);                                        \
+    /*fprintf(stderr, "%s --> ", prefix);*/                                    \
+    fprintf(stderr, "[%s:%d] %s --> ", __FILE__, __LINE__, prefix);            \
     fprintf(stderr, __VA_ARGS__);                                              \
   }
 #else
