@@ -466,6 +466,70 @@ int __tgt_rtl_device_type(int device_id){
   return -1;
 }
 
+int32_t __tgt_rtl_is_valid_binary(__tgt_device_image *image) {
+
+  // Is the library version incompatible with the header file?
+  if (elf_version(EV_CURRENT) == EV_NONE) {
+    DP("Incompatible ELF library!\n");
+    return 0;
+  }
+
+  char *img_begin = (char *)image->ImageStart;
+  char *img_end = (char *)image->ImageEnd;
+  size_t img_size = img_end - img_begin;
+
+  // Obtain elf handler
+  Elf *e = elf_memory(img_begin, img_size);
+  if (!e) {
+    DP("Unable to get ELF handle: %s!\n", elf_errmsg(-1));
+    return 0;
+  }
+
+  // Check if ELF is the right kind.
+  if (elf_kind(e) != ELF_K_ELF) {
+    DP("Unexpected ELF type!\n");
+    return 0;
+  }
+  Elf64_Ehdr *eh64 = elf64_getehdr(e);
+  Elf32_Ehdr *eh32 = elf32_getehdr(e);
+
+  if (!eh64 && !eh32) {
+    DP("Unable to get machine ID from ELF file!\n");
+    elf_end(e);
+    return 0;
+  }
+
+  uint16_t MachineID;
+  if (eh64 && !eh32)
+    MachineID = eh64->e_machine;
+  else if (eh32 && !eh64)
+    MachineID = eh32->e_machine;
+  else {
+    DP("Ambiguous ELF header!\n");
+    elf_end(e);
+    return 0;
+  }
+
+  elf_end(e);
+
+  switch(MachineID) {
+    // old brig file in HSA 1.0P
+    case 0:
+    // brig file in HSAIL path
+    case 44890:
+    case 44891:
+      break;
+    // amdgcn
+    case 224:
+      break;
+    default:
+      DP("Unsupported machine ID found: %d\n", MachineID);
+      return 0;
+  }
+
+  return 1;
+}
+
 int __tgt_rtl_number_of_devices(){
   return DeviceInfo.NumberOfDevices;
 }
