@@ -991,16 +991,14 @@ int32_t __tgt_rtl_run_target_team_region(int32_t device_id,
   DP("private_segment_size: %d\n", private_segment_size);
 
 
-  // All args are references
-
+  // All args are references, check before kernel
   for(int32_t i=0; i<arg_num; ++i) {
-    DP("Arg address passed down, (tgt:%016llx).\n", (long long unsigned)(Elf64_Addr)tgt_args[i]);
+    if (i!= arg_num-1) {
+      DP("Arg %d, first element as int: (tgt:%016llx) %d.\n", i, (long long unsigned)(Elf64_Addr)tgt_args[i], *(int *)tgt_args[i]);
+    }
   }
 
-  DP("Arg1: (tgt:%016llx) %d.\n", (long long unsigned)(Elf64_Addr)tgt_args[0], *(int *)tgt_args[0]);
-  DP("Arg2: (tgt:%016llx) %d.\n", (long long unsigned)(Elf64_Addr)tgt_args[1], *(int *)tgt_args[1]);
-
-#ifdef MANUAL_ARGS
+#ifdef RUNTIME_TEST
   /*
    * Allocate and initialize the kernel arguments and data.
    */
@@ -1033,7 +1031,6 @@ int32_t __tgt_rtl_run_target_team_region(int32_t device_id,
 
   hostArgs.arg1=arg1;
   hostArgs.arg2=arg2;
-
 #endif
 
   /*
@@ -1055,7 +1052,7 @@ int32_t __tgt_rtl_run_target_team_region(int32_t device_id,
   /*
    * Fill the kernarg_region
    */
-#ifdef MANUAL_ARGS
+#ifdef RUNTIME_TEST
   memcpy(kernarg_address, &hostArgs, sizeof(hostArgs));
 #else
   memcpy(kernarg_address, tgt_args, sizeof(void*)*arg_num);
@@ -1103,20 +1100,26 @@ int32_t __tgt_rtl_run_target_team_region(int32_t device_id,
   /*
    * Validate the data in the output buffer.
    */
+#ifdef RUNTIME_VERIFY
   int valid = memcmp(tgt_args[0],tgt_args[1], sizeof(int));
   if(!valid) {
     printf("Passed runtime validation.\n");
   } else {
     printf("Failed runtime Validation %d!\n", valid);
   }
+#endif
 
-#ifdef MANUAL_ARGS
+#ifdef RUNTIME_TEST
   free(arg1);
   free(arg2);
 #endif
 
-  DP("Arg1: (tgt:%016llx) %d.\n", (long long unsigned)(Elf64_Addr)tgt_args[0], *(int *)tgt_args[0]);
-  DP("Arg2: (tgt:%016llx) %d.\n", (long long unsigned)(Elf64_Addr)tgt_args[1], *(int *)tgt_args[1]);
+  // All args are references, check after kernel
+  for(int32_t i=0; i<arg_num; ++i) {
+    if (i!= arg_num-1) {
+      DP("Arg %d, first element as int: (tgt:%016llx) %d.\n", i, (long long unsigned)(Elf64_Addr)tgt_args[i], *(int *)tgt_args[i]);
+    }
+  }
 
   /*
    * Cleanup all allocated resources.
