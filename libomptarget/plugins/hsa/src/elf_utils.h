@@ -45,11 +45,7 @@ typedef enum {
 
 //typedef enum status_t status_t;
 
-#ifdef HSA10P
-#define MODULE_t hsa_ext_brig_module_t
-#else
 #define MODULE_t hsa_ext_module_t
-#endif
 
 #ifdef __cplusplus
 extern "C" {
