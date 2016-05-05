@@ -32,7 +32,13 @@ INC_FILES = $(wildcard src/*.h)
 CLBC_FILES = $(subst src/,obj/,$(CL_FILES:.cl=.bc))
 LLBC_FILES = $(subst src/,obj/,$(LL_FILES:.ll=.bc))
 
+ifneq ($(wildcard /opt/rocm/hlc3.2/bin/clc2),)
+CLC := /opt/rocm/hlc3.2/bin/clc2
+endif
+ifeq ($(CLC),)
 CLC := clc2
+endif
+
 CLCFLAGS := -cl-std=CL2.0 -D_WITHOUT_STDDEF_HEADER_
 
 AOC := aoc2
@@ -45,7 +51,7 @@ CLANG := clang
 CLANGFLAGS := -Xclang -cl-std=CL2.0 -D__OPENCL_VERSION__=200
 CLANGFLAGS += -Wno-typedef-redefinition
 # include libclc header
-CLANGFLAGS += -Xclang -include -Xclang $(BITCODE_LIBRARY_HEADER) -Dcl_clang_storage_class_specifiers
+CLANGFLAGS += -Xclang -include -Xclang $(BITCODE_HEADER) -Dcl_clang_storage_class_specifiers
 # using C calling convention
 CLANGFLAGS += -target amdgcn--amdhsa
 # using spir calling calling convention
