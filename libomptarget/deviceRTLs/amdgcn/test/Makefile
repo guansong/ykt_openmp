@@ -44,7 +44,7 @@ AOC_FLAGS += -march=hsail-64 -mdevice=Spectre
 CLANG := clang
 CLANGFLAGS := -Xclang -cl-std=CL2.0 -D__OPENCL_VERSION__=200
 CLANGFLAGS += -Wno-typedef-redefinition
-CLANGFLAGS += -Xclang -include -Xclang $(BITCODE_LIBRARY_HEADER) -Dcl_clang_storage_class_specifiers
+CLANGFLAGS += -Xclang -include -Xclang $(BITCODE_HEADER) -Dcl_clang_storage_class_specifiers
 # using C calling convention
 CLANGFLAGS += -target amdgcn--amdhsa
 # using spir calling calling convention
