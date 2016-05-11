@@ -23,7 +23,7 @@ endif()
 
 # We can't use clang as nvcc host processor, so we attempt to replace it with
 # gcc.
-if(CUDA_HOST_COMPILER MATCHES "(clang)|(.*/clang)$")
+if(NOT CUDA_HOST_COMPILER MATCHES "(gcc)|(.*/gcc)$")
 
   find_program(LIBOMPTARGET_NVPTX_ALTERNATE_GCC_HOST_COMPILER NAMES gcc)
   
