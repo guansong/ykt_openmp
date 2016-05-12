@@ -32,8 +32,10 @@ INC_FILES = $(wildcard src/*.h)
 CLBC_FILES = $(subst src/,obj/,$(CL_FILES:.cl=.bc))
 LLBC_FILES = $(subst src/,obj/,$(LL_FILES:.ll=.bc))
 
+ifeq ($(CLC),)
 ifneq ($(wildcard /opt/rocm/hlc3.2/bin/clc2),)
 CLC := /opt/rocm/hlc3.2/bin/clc2
+endif
 endif
 ifeq ($(CLC),)
 CLC := clc2
@@ -63,9 +65,17 @@ CLANGFLAGS += -emit-llvm -c
 LLVM-AS := `which clang | sed 's/clang$$/llvm-as/'`
 LLVM-DIS := llvm-dis
 
-ifneq ($(wildcard /opt/rocm/hcc-hsail/hlc/bin/llvm-link),)
-BCLNK := /opt/rocm/hcc-hsail/hlc/bin/llvm-link
+#ifeq ($(BCLNK),)
+#ifneq ($(wildcard /opt/rocm/hcc-hsail/hlc/bin/llvm-link),)
+#BCLNK := /opt/rocm/hcc-hsail/hlc/bin/llvm-link
+#endif
+#endif
+ifeq ($(BCLNK),)
+ifneq ($(wildcard /opt/rocm/hlc3.2/bin/llvm-link),)
+BCLNK := /opt/rocm/hlc3.2/bin/llvm-link
 endif
+endif
+#Overwrite with this if set
 ifneq ($(wildcard $(HSA_HLC_PATH)/llvm-link),)
 BCLNK := $(HSA_HLC_PATH)/llvm-link
 endif
