@@ -83,7 +83,7 @@ if(LIBOMPTARGET_AMDGCN_CLOC_COMPILER)
           add_custom_command(
             OUTPUT ${cn}.bc
             COMMAND ${LIBOMPTARGET_CLC_DIR}/clc2 ${CLCFLAGS} ${CMAKE_CURRENT_SOURCE_DIR}/src/${cn}.cl  -o ${cn}.bc
-            DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/${cn}.cl"
+            DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/${cn}.cl" "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h"
             )
           add_custom_target(${cn} DEPENDS ${cn}.bc)
         endforeach()
