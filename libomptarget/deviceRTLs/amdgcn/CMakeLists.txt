@@ -60,7 +60,12 @@ if(LIBOMPTARGET_AMDGCN_CLOC_COMPILER)
       if(LIBOMPTARGET_CLC_DIR)
         set(amdgcn_mcpu hsail)
       endif()
-  
+
+      # Activate RTL message dumps if requested by the user.
+      if(LIBOMPTARGET_AMDGCN_DEBUG)
+        set(AMDGCN_DEBUG -DOMPTARGET_AMDGCN_DEBUG=-1 -g)
+      endif()
+
       if(NOT LIBOMPTARGET_CLC_DIR)
       foreach(cn ${amdgcn_components})
          set(amdgcn_bc_files ${amdgcn_bc_files} ${cn}.bc)

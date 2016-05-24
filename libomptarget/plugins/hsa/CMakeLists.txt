@@ -42,6 +42,10 @@ if(LIBOMPTARGET_DEP_LIBELF_FOUND)
             # Define the suffix for the runtime messaging dumps.
             add_definitions(-DTARGET_NAME=HSA)
        
+            if(CMAKE_BUILD_TYPE MATCHES Debug)
+              add_definitions(-DHSA_ERROR_REPORT)
+            endif()
+
             include_directories(${LIBOMPTARGET_DEP_HSA_INCLUDE_DIRS})
     
             add_library(omptarget.rtl.hsa SHARED src/rtl.cpp src/elf_utils.cpp)
