@@ -44,14 +44,14 @@ if(LIBOMPTARGET_DEP_LIBELF_FOUND)
        
             include_directories(${LIBOMPTARGET_DEP_HSA_INCLUDE_DIRS})
     
-            add_library(omptarget.rtl.hsa SHARED src/rtl.cpp)
+            add_library(omptarget.rtl.hsa SHARED src/rtl.cpp src/elf_utils.cpp)
       
             # Install plugin under the lib destination folder.
             install(TARGETS omptarget.rtl.hsa LIBRARY DESTINATION "lib")
       
             target_link_libraries(
                omptarget.rtl.hsa 
-                  ${LIBOMPTARGET_DEP_HSA_LIBRARIES_DIRS}/libhsa-runtime64.so
+                  -L${LIBOMPTARGET_DEP_HSA_LIBRARIES_DIRS} -lhsa-runtime64
                   ${LIBOMPTARGET_DEP_LIBELF_LIBRARIES}
                   "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/../exports"
             )
