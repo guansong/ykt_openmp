@@ -59,7 +59,7 @@ CFLAGS += -DHSA10P
 endif
 
 ifneq ($(build_hsa),)
-../../lib/libomptarget.rtl.amdhsa.so : $(OBJ_FILES)
+../../lib/libomptarget.rtl.hsa.so : $(OBJ_FILES)
 	@ echo "Building HSA target RTL" && \
 	mkdir -p ../../lib
 	$(CC) $(LDFLAGS) -o $@ $(OBJ_FILES)

@@ -88,7 +88,7 @@ CLCFLAGS += -DOMPTARGET_HSAIL_DEBUG=-1 -g -DHSA_ERROR_REPORT
 endif
 
 ifneq ($(build_hsa),)
-../../lib/libomptarget-hsail.bc : $(CLBC_FILES) $(LLBC_FILES)
+../../lib/libomptarget-amdgcn-hsail.bc : $(CLBC_FILES) $(LLBC_FILES)
 	@ echo "Building HSA target RTL" && \
 	mkdir -p ../../lib
 	$(BCLNK) $(LNKFLAGS) -o $@ $(CLBC_FILES) $(LLBC_FILES)

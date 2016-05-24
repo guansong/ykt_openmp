@@ -34,7 +34,7 @@
 static const char *RTLNames[] = {
     /* PowerPC target */ "libomptarget.rtl.ppc64.so",
     /* x86_64 target  */ "libomptarget.rtl.x86_64.so",
-    /* AMD HSA target  */ "libomptarget.rtl.amdhsa.so",
+    /* AMD HSA target  */ "libomptarget.rtl.hsa.so",
     /* CUDA target    */ "libomptarget.rtl.cuda.so"};
 
 struct RTLInfoTy;
