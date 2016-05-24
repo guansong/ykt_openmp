@@ -32,6 +32,23 @@ if(LIBOMPTARGET_AMDGCN_CLOC_COMPILER)
          task
       )
 
+      if(LIBOMPTARGET_AMDGCN_CLC_COMPILER OR CLC)
+        find_path (
+          LIBOMPTARGET_CLC_DIR
+          NAMES
+          clc2
+          PATHS
+          $ENV{HSA_CLC_PATH}/bin
+          /opt/rocm/hlc3.2/bin
+          /usr/local/bin
+          )
+
+        if(LIBOMPTARGET_CLC_DIR)
+          set(CLCFLAGS -cl-std=CL2.0)
+          set(CLCFLAGS ${CLCFLAGS} -D_WITHOUT_STDDEF_HEADER_)
+        endif()
+      endif()
+
       # cmake caller should set LIBOMPTARGET_AMDGCN_MCPU to `mymcpu` 
       # but set to fiji otherwise.  Eventually, we will build ALL mcpus
       if(LIBOMPTARGET_AMDGCN_MCPU)
@@ -39,7 +56,12 @@ if(LIBOMPTARGET_AMDGCN_CLOC_COMPILER)
       else()
          set(amdgcn_mcpu fiji)
       endif()
+
+      if(LIBOMPTARGET_CLC_DIR)
+        set(amdgcn_mcpu hsail)
+      endif()
   
+      if(NOT LIBOMPTARGET_CLC_DIR)
       foreach(cn ${amdgcn_components})
          set(amdgcn_bc_files ${amdgcn_bc_files} ${cn}.bc)
          add_custom_command(
@@ -50,9 +72,33 @@ if(LIBOMPTARGET_AMDGCN_CLOC_COMPILER)
          )
          add_custom_target(${cn} DEPENDS ${cn}.bc)
       endforeach()
+      else()
+        foreach(cn ${amdgcn_components})
+          set(amdgcn_bc_files ${amdgcn_bc_files} ${cn}.bc)
+          add_custom_command(
+            OUTPUT ${cn}.bc
+            COMMAND ${LIBOMPTARGET_CLC_DIR}/clc2 ${CLCFLAGS} ${CMAKE_CURRENT_SOURCE_DIR}/src/${cn}.cl  -o ${cn}.bc
+            DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/${cn}.cl"
+            )
+          add_custom_target(${cn} DEPENDS ${cn}.bc)
+        endforeach()
+      endif()
 
       # Build the compsite bc file by linking the bc for each cl file
-      add_custom_command(OUTPUT libomptarget-amdgcn-${amdgcn_mcpu}.bc COMMAND /opt/amd/llvm/bin/llvm-link ${amdgcn_bc_files} -o libomptarget-amdgcn-${amdgcn_mcpu}.bc DEPENDS ${amdgcn_components})
+      if(NOT LIBOMPTARGET_CLC_DIR)
+        add_custom_command(
+          OUTPUT libomptarget-amdgcn-${amdgcn_mcpu}.bc
+          COMMAND /opt/amd/llvm/bin/llvm-link ${amdgcn_bc_files} -o libomptarget-amdgcn-${amdgcn_mcpu}.bc
+          DEPENDS ${amdgcn_components}
+          )
+      else()
+        add_custom_command(
+          OUTPUT libomptarget-amdgcn-${amdgcn_mcpu}.bc
+          COMMAND ${LIBOMPTARGET_CLC_DIR}/llvm-link ${amdgcn_bc_files} -o libomptarget-amdgcn-${amdgcn_mcpu}.bc
+          DEPENDS ${amdgcn_components}
+          )
+      endif()
+
       add_custom_target(omptarget-amdgcn DEPENDS libomptarget-amdgcn-${amdgcn_mcpu}.bc)
       add_dependencies(omptarget omptarget-amdgcn)
 

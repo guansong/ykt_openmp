@@ -10,6 +10,7 @@
 # Build a plugin for an HSA machine if available.
 #
 ##===----------------------------------------------------------------------===##
+
 if(LIBOMPTARGET_DEP_LIBELF_FOUND)
    if(LIBOMPTARGET_AMDGCN_CLOC_COMPILER)
       find_program(amdgcn_cloc NAMES ${LIBOMPTARGET_AMDGCN_CLOC_COMPILER})
@@ -17,6 +18,26 @@ if(LIBOMPTARGET_DEP_LIBELF_FOUND)
          if(CMAKE_SYSTEM_PROCESSOR MATCHES "(x86_64)|(ppc64le)$" AND CMAKE_SYSTEM_NAME MATCHES "Linux")
 
             libomptarget_say("Building HSA offloading plugin. ... ")
+
+            find_path (
+              LIBOMPTARGET_DEP_HSA_INCLUDE_DIRS
+              NAMES
+              hsa.h
+              PATHS
+              $ENV{HSA_RUNTIME_PATH}/include
+              /opt/rocm/include/hsa
+              /usr/local/include
+              )
+
+            find_path (
+              LIBOMPTARGET_DEP_HSA_LIBRARIES_DIRS
+              NAMES
+              libhsa-runtime64.so
+              PATHS
+              $ENV{HSA_RUNTIME_PATH}/lib
+              /opt/rocm/lib/
+              /usr/local/lib
+              )
 
             # Define the suffix for the runtime messaging dumps.
             add_definitions(-DTARGET_NAME=HSA)
@@ -30,7 +51,7 @@ if(LIBOMPTARGET_DEP_LIBELF_FOUND)
       
             target_link_libraries(
                omptarget.rtl.hsa 
-                  ${LIBOMPTARGET_DEP_HSA_LIBRARIES} 
+                  ${LIBOMPTARGET_DEP_HSA_LIBRARIES_DIRS}/libhsa-runtime64.so
                   ${LIBOMPTARGET_DEP_LIBELF_LIBRARIES}
                   "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/../exports"
             )
