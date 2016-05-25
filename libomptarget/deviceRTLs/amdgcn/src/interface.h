@@ -30,8 +30,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
-//typedef atomic_int omp_lock_t;      /* arbitrary type of the right length */
-typedef int omp_lock_t;      /* Use cl 1.2 atomic functions on omp_lock_t */
+typedef atomic_int omp_lock_t;      /* arbitrary type of the right length */
+//typedef int omp_lock_t;      /* Use cl 1.2 atomic functions on omp_lock_t */
 typedef uint64_t omp_nest_lock_t; /* arbitrary type of the right length */
 
 
