@@ -14,9 +14,7 @@
 if(LIBOMPTARGET_DEP_LIBELF_FOUND)
   if (LIBOMPTARGET_DEP_LIBHSA_FOUND)
     # Find device compiler
-    find_program(amdgcn_cloc NAMES ${LIBOMPTARGET_AMDGCN_CLOC_COMPILER})
-
-    if(amdgcn_cloc)
+    if(LIBOMPTARGET_DEVICE_COMPILER)
       if(CMAKE_SYSTEM_PROCESSOR MATCHES "(x86_64)|(ppc64le)$" AND CMAKE_SYSTEM_NAME MATCHES "Linux")
 
         libomptarget_say("Building HSA offloading plugin. ... ")

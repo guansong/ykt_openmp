@@ -160,7 +160,55 @@ mark_as_advanced(
   LIBOMPTARGET_DEP_LIBHSA_INCLUDE_DIRS
   LIBOMPTARGET_DEP_LIBHSA_LIBRARIES_DIRS)
 
-#set(LIBOMPTARGET_AMDGCN_CLC_COMPILER "clc2")
-set(LIBOMPTARGET_AMDGCN_CLOC_COMPILER "cloc.sh")
+# Do not use this until we are ready
+if(0)
+  if ("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
+    # require at least clang 3.9 for cl support
+    if (NOT CMAKE_C_COMPILER_VERSION VERSION_LESS 3.9)
+      set(LIBOMPTARGET_DEVICE_COMPILER "clang")
+      set(LIBOMPTARGET_USE_BUILD_COMPILER true)
+    endif()
+  endif()
+endif()
 
+if (CLC)
+  find_path (
+    LIBOMPTARGET_CLC_DIR
+    NAMES
+    clc2
+    PATHS
+    $ENV{HSA_CLC_PATH}/bin
+    /opt/rocm/hlc3.2/bin
+    /usr/local/bin
+    )
+
+  if (LIBOMPTARGET_CLC_DIR)
+    set(LIBOMPTARGET_DEVICE_COMPILER "clc2")
+  endif()
+endif()
+
+if (NOT LIBOMPTARGET_DEVICE_COMPILER)
+  find_path (
+    LIBOMPTARGET_CLANG_DIR
+    NAMES
+    clang-3.9
+    PATHS
+    /opt/amd/llvm/bin
+    /usr/local/bin
+    )
+
+  find_path (
+    LIBOMPTARGET_CLC_INC_DIR
+    NAMES
+    clc/clc.h
+    PATHS
+    /opt/rocm/libamdgcn/include
+    /usr/local/include
+    )
+
+  if (LIBOMPTARGET_CLANG_DIR)
+    set(LIBOMPTARGET_DEVICE_COMPILER "clang")
+    set(LIBOMPTARGET_DEVICE_COMPILER_INC_DIR ${LIBOMPTARGET_CLC_INC_DIR})
+  endif()
+endif()
 
