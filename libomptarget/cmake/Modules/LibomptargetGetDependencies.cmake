@@ -19,9 +19,12 @@
 
 include (FindPackageHandleStandardArgs)
 
+find_package(PkgConfig)
+
 ################################################################################
 # Looking for libelf...
 ################################################################################
+pkg_check_modules(LIBOMPTARGET_SEARCH_LIBELF QUIET libelf)
 
 find_path (
   LIBOMPTARGET_DEP_LIBELF_INCLUDE_DIR
@@ -62,8 +65,6 @@ mark_as_advanced(
 ################################################################################
 # Looking for libffi...
 ################################################################################
-find_package(PkgConfig)
-
 pkg_check_modules(LIBOMPTARGET_SEARCH_LIBFFI QUIET libffi)
 
 find_path (
@@ -123,6 +124,43 @@ mark_as_advanced(
   LIBOMPTARGET_DEP_CUDA_INCLUDE_DIRS
   LIBOMPTARGET_DEP_CUDA_LIBRARIES)
 
+
+################################################################################
+# Looking for ROCM...
+################################################################################
+pkg_check_modules(LIBOMPTARGET_SEARCH_LIBHSA QUIET libhsa-runtime64)
+
+find_path (
+  LIBOMPTARGET_DEP_LIBHSA_INCLUDE_DIRS
+  NAMES
+  hsa.h
+  PATHS
+  $ENV{HSA_RUNTIME_PATH}/include
+  /opt/rocm/include/hsa
+  /usr/local/include
+  )
+
+find_path (
+  LIBOMPTARGET_DEP_LIBHSA_LIBRARIES_DIRS
+  NAMES
+  libhsa-runtime64.so
+  PATHS
+  $ENV{HSA_RUNTIME_PATH}/lib
+  /opt/rocm/lib/
+  /usr/local/lib
+  )
+
+find_package_handle_standard_args(
+  LIBOMPTARGET_DEP_LIBHSA
+  DEFAULT_MSG
+  LIBOMPTARGET_DEP_LIBHSA_LIBRARIES_DIRS
+  LIBOMPTARGET_DEP_LIBHSA_INCLUDE_DIRS)
+
+mark_as_advanced(
+  LIBOMPTARGET_DEP_LIBHSA_INCLUDE_DIRS
+  LIBOMPTARGET_DEP_LIBHSA_LIBRARIES_DIRS)
+
 #set(LIBOMPTARGET_AMDGCN_CLC_COMPILER "clc2")
 set(LIBOMPTARGET_AMDGCN_CLOC_COMPILER "cloc.sh")
+
 
