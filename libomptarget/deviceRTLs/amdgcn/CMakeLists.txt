@@ -119,7 +119,7 @@ if(LIBOMPTARGET_DEVICE_COMPILER)
   add_custom_command(
     OUTPUT libomptarget-amdgcn-${amdgcn_mcpu}.bc
     COMMAND ${DL} ${amdgcn_bc_files} -o libomptarget-amdgcn-${amdgcn_mcpu}.bc
-    DEPENDS ${amdgcn_components}
+    DEPENDS ${amdgcn_bc_files}
     )
 
   add_custom_target(omptarget-amdgcn DEPENDS libomptarget-amdgcn-${amdgcn_mcpu}.bc)
