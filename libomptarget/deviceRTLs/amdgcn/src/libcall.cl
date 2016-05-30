@@ -387,17 +387,23 @@ EXTERN int omp_is_initial_device(void)
 #define SET 1
 
 
+#if OMPTARGET_HSAIL_DEBUG == 0
+#define atomic_compare_exchange_strong __compare_exchange_int_global
 EXTERN int __hsail_atomic_compare_exchange_int_global(__global omp_lock_t *, int, int);
-
 EXTERN int __compare_exchange_int_global(__global omp_lock_t * lock, int * comp, int val)
 {
     // implemented in hsa_math.bc
     return __hsail_atomic_compare_exchange_int_global(lock, *comp, val);
 }
 
+#define atomic_store __exchange_int_global
+EXTERN int __hsail_atomic_exchange_int_global(__global omp_lock_t *, int);
+EXTERN int __exchange_int_global(__global omp_lock_t * lock, int val)
+{
+    // implemented in hsa_math.bc
+    return __hsail_atomic_exchange_int_global(lock, val);
+}
 
-#if OMPTARGET_HSAIL_DEBUG == 0
-#define atomic_compare_exchange_strong __compare_exchange_int_global
 #else
 // Use OpenCL function for now
 #endif
