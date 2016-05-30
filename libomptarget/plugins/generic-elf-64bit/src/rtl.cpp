@@ -40,7 +40,12 @@
 #define DP(...) DEBUGP("Target " GETNAME(TARGET_NAME) " RTL", __VA_ARGS__)
 
 #define NUMBER_OF_DEVICES 4
+
+#ifdef CLANG_TRUNK
 #define OFFLOADSECTIONNAME ".omp_offloading.entries"
+#else
+#define OFFLOADSECTIONNAME ".openmptgt_host_entries"
+#endif
 
 /// Array of Dynamic libraries loaded for this target.
 struct DynLibTy {
