@@ -46,7 +46,7 @@
 #define check(msg, status) \
   if (status != HSA_STATUS_SUCCESS) { \
     /* fprintf(stderr, "[%s:%d] %s failed.\n", __FILE__, __LINE__, #msg);*/ \
-    DP(#msg"failed \n") \
+    DP(#msg" failed\n") \
     /*assert(0);*/ \
   } else { \
     /* fprintf(stderr, "[%s:%d] %s succeeded.\n", __FILE__, __LINE__, #msg); */ \
@@ -312,7 +312,7 @@ public:
     char name[64] = { 0 };
     err = hsa_agent_get_info(agent, HSA_AGENT_INFO_NAME, name);
     check(Querying the agent name, err);
-    printf("The agent name is %s.\n", name);
+    //printf("The agent name is %s.\n", name);
 
     /*
      * Query the maximum size of the queue.
@@ -320,7 +320,7 @@ public:
     uint32_t queue_size = 0;
     err = hsa_agent_get_info(agent, HSA_AGENT_INFO_QUEUE_MAX_SIZE, &queue_size);
     check(Querying the agent maximum queue size, err);
-    printf("The maximum queue size is %u.\n", (unsigned int) queue_size);
+    //printf("The maximum queue size is %u.\n", (unsigned int) queue_size);
 
     /*
      * Create a queue using the maximum size.
@@ -352,7 +352,7 @@ public:
     uint32_t wavefront_size = 0;
     err = hsa_agent_get_info(agent, HSA_AGENT_INFO_WAVEFRONT_SIZE, &wavefront_size);
     check(Querying the agent maximum queue size, err);
-    printf("The wavefront size is %u.\n", (unsigned int) wavefront_size);
+    //printf("The wavefront size is %u.\n", (unsigned int) wavefront_size);
 
     /*
      * Query the workgroup size.
@@ -360,7 +360,7 @@ public:
     uint32_t workgroup_size = 0;
     err = hsa_agent_get_info(agent, HSA_AGENT_INFO_WORKGROUP_MAX_SIZE, &workgroup_size);
     check(Querying the agent maximum queue size, err);
-    printf("The max workgroup size is %u.\n", (unsigned int) workgroup_size);
+    //printf("The max workgroup size is %u.\n", (unsigned int) workgroup_size);
 
 
     // Init the device info
