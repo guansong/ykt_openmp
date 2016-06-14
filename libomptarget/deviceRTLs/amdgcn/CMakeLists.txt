@@ -105,6 +105,10 @@ if(LIBOMPTARGET_DEVICE_COMPILER)
   #MESSAGE( STATUS "Device COMPILER FLAGS: ${DCFLAGS}" )
   libomptarget_say("Device COMPILER set as ${DC}")
 
+  #if (CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+  #  libomptarget_say("Archive dir: ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}")
+  #endif()
+
   foreach(cn ${amdgcn_components})
     set(amdgcn_bc_files ${amdgcn_bc_files} ${cn}.bc)
     add_custom_command(
@@ -116,16 +120,29 @@ if(LIBOMPTARGET_DEVICE_COMPILER)
   endforeach()
 
   # Build the compsite bc file by linking the bc for each cl file
-  add_custom_command(
-    OUTPUT libomptarget-amdgcn-${amdgcn_mcpu}.bc
-    COMMAND ${DL} ${amdgcn_bc_files} -o libomptarget-amdgcn-${amdgcn_mcpu}.bc
-    DEPENDS ${amdgcn_bc_files}
-    )
+
+  if (NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+    add_custom_command(
+      OUTPUT libomptarget-amdgcn-${amdgcn_mcpu}.bc
+      COMMAND ${DL} ${amdgcn_bc_files} -o libomptarget-amdgcn-${amdgcn_mcpu}.bc
+      DEPENDS ${amdgcn_bc_files}
+      )
+  else()
+    add_custom_command(
+      OUTPUT libomptarget-amdgcn-${amdgcn_mcpu}.bc
+      COMMAND ${DL} ${amdgcn_bc_files} -o ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/libomptarget-amdgcn-${amdgcn_mcpu}.bc
+      DEPENDS ${amdgcn_bc_files}
+      )
+  endif()
 
   add_custom_target(omptarget-amdgcn DEPENDS libomptarget-amdgcn-${amdgcn_mcpu}.bc)
   add_dependencies(omptarget omptarget-amdgcn)
 
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libomptarget-amdgcn-${amdgcn_mcpu}.bc DESTINATION "lib")
+  if (NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libomptarget-amdgcn-${amdgcn_mcpu}.bc DESTINATION "lib")
+  else()
+    install(FILES ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/libomptarget-amdgcn-${amdgcn_mcpu}.bc DESTINATION "lib")
+  endif()
 
 else()
   libomptarget_say("Not building AMDGCN device RTL: Device compiler not found")
