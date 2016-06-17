@@ -699,8 +699,15 @@ __tgt_target_table *__tgt_rtl_load_binary(int32_t device_id, __tgt_device_image 
     /*
      * Deserialize.
      */
-    err = hsa_code_object_deserialize((char *)image->ImageStart, img_size, NULL, &code_object);
+    //FIXME: HSA runtime need malloc to see the right address range
+    void *new_img = malloc(img_size);
+    memcpy(new_img, image->ImageStart, img_size);
+    //err = hsa_code_object_deserialize((char *)image->ImageStart, img_size, NULL, &code_object);
+    err = hsa_code_object_deserialize((char *)new_img, img_size, NULL, &code_object);
     check(Deserialize, err);
+    free(new_img);
+    // printf("deserialization return code: %d\n", err);
+
     // extra check
     assert(code_object.handle != 0);
   }
@@ -784,20 +791,34 @@ __tgt_target_table *__tgt_rtl_load_binary(int32_t device_id, __tgt_device_image 
       continue;
     }
 
-    sprintf(name_buffer, "&%s", e->name);
-    DP("to find the kernel name: %s\n", name_buffer);
-
     /*
      * Extract the symbol from the executable.
      */
-    err = hsa_executable_get_symbol(executable, NULL, name_buffer, DeviceInfo.agent, 0, symbol);
-    check(Extract the symbol from the executable, err);
-
-    if (err != HSA_STATUS_SUCCESS) {
-      sprintf(name_buffer, "&%s", (e->name+1));
-      DP("try another kernel name: %s\n", name_buffer);
+    if (useBrig) {
+      sprintf(name_buffer, "&%s", (e->name));
+      DP("to find the kernel name: %s\n", name_buffer);
       err = hsa_executable_get_symbol(executable, NULL, name_buffer, DeviceInfo.agent, 0, symbol);
       check(Extract the symbol from the executable, err);
+
+      if (err != HSA_STATUS_SUCCESS) {
+        sprintf(name_buffer, "&%s", (e->name+1));
+        DP("try another kernel name: %s\n", name_buffer);
+        err = hsa_executable_get_symbol(executable, NULL, name_buffer, DeviceInfo.agent, 0, symbol);
+        check(Extract the symbol from the executable, err);
+      }
+    }
+    else {
+      sprintf(name_buffer, "%s", e->name);
+      DP("to find the kernel name: %s\n", name_buffer);
+      err = hsa_executable_get_symbol(executable, NULL, name_buffer, DeviceInfo.agent, 0, symbol);
+      check(Extract the symbol from the executable, err);
+
+      if (err != HSA_STATUS_SUCCESS) {
+        sprintf(name_buffer, "%s", (e->name+1));
+        DP("try another kernel name: %s\n", name_buffer);
+        err = hsa_executable_get_symbol(executable, NULL, name_buffer, DeviceInfo.agent, 0, symbol);
+        check(Extract the symbol from the executable, err);
+      }
     }
 
     if (err != HSA_STATUS_SUCCESS) {
