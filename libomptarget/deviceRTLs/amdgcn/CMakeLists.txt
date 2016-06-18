@@ -84,7 +84,7 @@ if(LIBOMPTARGET_DEVICE_COMPILER)
     #set(CLANGFLAGS ${CLANGFLAGS} -Dcl_khr_fp64)
     #set(CLANGFLAGS ${CLANGFLAGS} -fno-builtin)
 
-    set(CLANGFLAGS ${CLANGFLAGS} -target amdgcn--amdhsa)
+    set(CLANGFLAGS ${CLANGFLAGS} -target spir64-unknown-unknown)
 
     # emit-llvm for cpu???
     if (NOT amdgcn_mcpu MATCHES "hsail")

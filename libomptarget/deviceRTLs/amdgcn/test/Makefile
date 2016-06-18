@@ -51,6 +51,12 @@ CLANGFLAGS += -target amdgcn--amdhsa
 #CLANGFLAGS += -target spir64-unknown-unknown
 CLANGFLAGS += -emit-llvm -c
 
+LNK := llvm-link
+LNKFLAGS := -suppress-warnings
+LNKLIBS := ${HSA_BUILTIN_PATH}/hsa_math.bc
+LNKLIBS += ${HSA_BUILTIN_PATH}/builtins-hsail.opt.bc
+LNKLIBS += ${HSA_BUILTIN_PATH}/hsail-amdgpu-wrapper.ll
+
 LLC := llc
 LLCFLAGS := -mtriple amdgcn--amdhsa
 LLCFLAGS += -mcpu=kaveri
@@ -58,12 +64,12 @@ LLCFLAGS += -mcpu=kaveri
 LLCFLAGS += -filetype=obj
 
 LLD := lld
-LLDFLAGS := -flavor gnu
+LLDFLAGS := -flavor gnu -shared
 
 
 #llc -mtriple amdgcn--amdhsa -mcpu=kaveri -filetype=asm -o linked.s hello_world.bc
 #llc -mtriple amdgcn--amdhsa -mcpu=kaveri -filetype=obj -o linked.o hello_world.bc
-#lld -flavor gnu -o a.out linked.o
+#lld -flavor gnu -shared -o a.out linked.o
 
 all: driver test
 
@@ -71,7 +77,8 @@ compile:
 	@echo
 	@echo ------------------------- compile -------------------------
 	$(CLANG) $(CLANGFLAGS) driver.cl
-	$(LLC) $(LLCFLAGS) -o kernel.o driver.bc
+	$(LNK) $(LNKFLAGS) -o driver.lnk.bc driver.bc ${LNKLIBS}
+	$(LLC) $(LLCFLAGS) -o kernel.o driver.lnk.bc
 	$(LLD) $(LLDFLAGS) -o kernel kernel.o
 
 

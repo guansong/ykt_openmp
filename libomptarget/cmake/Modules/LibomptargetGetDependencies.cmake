@@ -193,6 +193,7 @@ if (NOT LIBOMPTARGET_DEVICE_COMPILER)
     NAMES
     clang-3.9
     PATHS
+    $ENV{CLANG_OCL_PATH}/bin
     /opt/amd/llvm/bin
     /usr/local/bin
     )

@@ -70,10 +70,43 @@ typedef unsigned long uint64_t;
 #define NOT_FINISHED 1
 #define LAST_CHUNK 2
 
-
 #define TEAM_MASTER 0
 #define BARRIER_COUNTER 0
 #define ORDERED_COUNTER 1
+
+// For Intrinsic mapping
+#if OMPTARGET_HSAIL_DEBUG == 0
+// Do not use OpenCL builtin functions
+#define get_global_size _Z15get_global_sizej
+EXTERN long _Z15get_global_sizej(int);
+
+#define get_global_id _Z13get_global_idj
+EXTERN long _Z13get_global_idj(int);
+
+#define get_local_size _Z14get_local_sizej
+EXTERN long _Z14get_local_sizej(int);
+
+#define get_local_id _Z12get_local_idj
+EXTERN long _Z12get_local_idj(int);
+
+#define get_num_groups _Z14get_num_groupsj
+EXTERN long _Z14get_num_groupsj(int);
+
+#define get_group_id _Z12get_group_idj
+EXTERN long _Z12get_group_idj(int);
+
+#define barrier _Z7barrierj
+EXTERN void _Z7barrierj(int);
+
+#define atomic_compare_exchange_strong __compare_exchange_int_global
+EXTERN int __compare_exchange_int_global(__global omp_lock_t *, int *, int);
+
+#define atomic_store __exchange_int_global
+EXTERN int __exchange_int_global(__global omp_lock_t *, int);
+#else
+// Use the OpenCL builtin functions
+#endif
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // global ICV
