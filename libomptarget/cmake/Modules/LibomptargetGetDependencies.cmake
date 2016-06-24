@@ -179,7 +179,6 @@ if (CLC)
     PATHS
     $ENV{HSA_CLC_PATH}/bin
     /opt/rocm/hlc3.2/bin
-    /usr/local/bin
     )
 
   if (LIBOMPTARGET_CLC_DIR)
@@ -195,16 +194,7 @@ if (NOT LIBOMPTARGET_DEVICE_COMPILER)
     PATHS
     $ENV{CLANG_OCL_PATH}/bin
     /opt/amd/llvm/bin
-    /usr/local/bin
-    )
-
-  find_path (
-    LIBOMPTARGET_CLC_INC_DIR
-    NAMES
-    clc/clc.h
-    PATHS
-    /opt/rocm/libamdgcn/include
-    /usr/local/include
+    /usr/bin
     )
 
   if (LIBOMPTARGET_CLANG_DIR)

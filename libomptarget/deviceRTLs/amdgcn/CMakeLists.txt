@@ -77,11 +77,13 @@ if(LIBOMPTARGET_DEVICE_COMPILER)
     set(CLANGFLAGS -Xclang -cl-std=CL2.0)
     set(CLANGFLAGS ${CLANGFLAGS} -D__OPENCL_VERSION__=200)
 
-    set(CLANGFLAGS ${CLANGFLAGS} -I${LIBOMPTARGET_CLC_INC_DIR} -include clc/clc.h)
-    set(CLANGFLAGS ${CLANGFLAGS} -Dcl_clang_storage_class_specifiers)
+    #set(CLANGFLAGS ${CLANGFLAGS} -I${LIBOMPTARGET_CLC_INC_DIR} -include clc/clc.h)
+    #set(CLANGFLAGS ${CLANGFLAGS} -Dcl_clang_storage_class_specifiers)
 
     #set(CLANGFLAGS ${CLANGFLAGS} -Dcl_khr_int64)
     #set(CLANGFLAGS ${CLANGFLAGS} -Dcl_khr_fp64)
+
+    # May need to turn this one back on?
     #set(CLANGFLAGS ${CLANGFLAGS} -fno-builtin)
 
     set(CLANGFLAGS ${CLANGFLAGS} -target spir64-unknown-unknown)

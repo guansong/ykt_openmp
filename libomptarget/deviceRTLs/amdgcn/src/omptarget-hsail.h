@@ -103,6 +103,14 @@ EXTERN int __compare_exchange_int_global(__global omp_lock_t *, int *, int);
 
 #define atomic_store __exchange_int_global
 EXTERN int __exchange_int_global(__global omp_lock_t *, int);
+
+#ifndef CLK_LOCAL_MEM_FENCE
+#define CLK_LOCAL_MEM_FENCE 1
+#endif
+#ifndef CLK_GLOBAL_MEM_FENCE
+#define CLK_GLOBAL_MEM_FENCE 2
+#endif
+
 #else
 // Use the OpenCL builtin functions
 #endif
