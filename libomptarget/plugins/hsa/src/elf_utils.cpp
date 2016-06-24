@@ -99,8 +99,8 @@ static Elf_Scn* extract_elf_section (Elf *elfP,
   char* sectionName = NULL;
 
   /* Iterate thru the elf sections */
-  for (cnt = 1, scn = NULL; scn = elf_nextscn(elfP, scn); cnt++) {
-    if (((shdr = elf32_getshdr(scn)) == NULL)) {
+  for (cnt = 1, scn = NULL; (scn = elf_nextscn(elfP, scn)); cnt++) {
+    if ((shdr = elf32_getshdr(scn)) == NULL) {
       return NULL;
     }
     sectionName = (char *)secHdr->d_buf + shdr->sh_name;
