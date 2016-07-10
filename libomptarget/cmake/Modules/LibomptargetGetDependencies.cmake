@@ -177,7 +177,7 @@ if (CLC)
     NAMES
     clc2
     PATHS
-    $ENV{HSA_CLC_PATH}/bin
+    $ENV{HSA_CLC_PATH}
     /opt/rocm/hlc3.2/bin
     )
 
@@ -192,9 +192,8 @@ if (NOT LIBOMPTARGET_DEVICE_COMPILER)
     NAMES
     clang-3.9
     PATHS
-    $ENV{CLANG_OCL_PATH}/bin
+    $ENV{CLANG_OCL_PATH}
     /opt/amd/llvm/bin
-    /usr/bin
     )
 
   if (LIBOMPTARGET_CLANG_DIR)
