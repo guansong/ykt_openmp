@@ -46,9 +46,9 @@ CLANGFLAGS := -Xclang -cl-std=CL2.0 -D__OPENCL_VERSION__=200
 CLANGFLAGS += -Wno-typedef-redefinition
 #CLANGFLAGS += -Xclang -include -Xclang $(BITCODE_HEADER) -Dcl_clang_storage_class_specifiers
 # using C calling convention
-CLANGFLAGS += -target amdgcn--amdhsa
+#CLANGFLAGS += -target amdgcn--amdhsa
 # using spir calling calling convention
-#CLANGFLAGS += -target spir64-unknown-unknown
+CLANGFLAGS += -target spir64-unknown-unknown
 CLANGFLAGS += -emit-llvm -c
 
 LNK := llvm-link
