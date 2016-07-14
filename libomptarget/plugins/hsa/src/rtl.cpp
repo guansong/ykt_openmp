@@ -115,27 +115,6 @@ struct BrigData {
 };
 
 /*
- * Determines if the given agent is of type HSA_DEVICE_TYPE_GPU
- * and sets the value of data to the agent handle if it is.
- */
-static hsa_status_t find_gpu(hsa_agent_t agent, void *data)
-{
-  if (data == NULL) {
-    return HSA_STATUS_ERROR_INVALID_ARGUMENT;
-  }
-  hsa_device_type_t device_type;
-  hsa_status_t stat =
-    hsa_agent_get_info(agent, HSA_AGENT_INFO_DEVICE, &device_type);
-  if (stat != HSA_STATUS_SUCCESS) {
-    return stat;
-  }
-  if (device_type == HSA_DEVICE_TYPE_GPU) {
-    *((hsa_agent_t *)data) = agent;
-  }
-  return HSA_STATUS_SUCCESS;
-}
-
-/*
  * Determines if a memory region can be used for kernarg
  * allocations.
  */
@@ -149,6 +128,28 @@ static hsa_status_t get_kernarg_memory_region(hsa_region_t region, void* data) {
   hsa_region_global_flag_t flags;
   hsa_region_get_info(region, HSA_REGION_INFO_GLOBAL_FLAGS, &flags);
   if (flags & HSA_REGION_GLOBAL_FLAG_KERNARG) {
+    hsa_region_t* ret = (hsa_region_t*) data;
+    *ret = region;
+    return HSA_STATUS_INFO_BREAK;
+  }
+
+  return HSA_STATUS_SUCCESS;
+}
+
+/*
+ * Determines if a memory region can be used for fine grained
+ * allocations.
+ */
+static hsa_status_t get_fine_grained_memory_region(hsa_region_t region, void* data) {
+  hsa_region_segment_t segment;
+  hsa_region_get_info(region, HSA_REGION_INFO_SEGMENT, &segment);
+  if (HSA_REGION_SEGMENT_GLOBAL != segment) {
+    return HSA_STATUS_SUCCESS;
+  }
+
+  hsa_region_global_flag_t flags;
+  hsa_region_get_info(region, HSA_REGION_INFO_GLOBAL_FLAGS, &flags);
+  if (flags & HSA_REGION_GLOBAL_FLAG_FINE_GRAINED) {
     hsa_region_t* ret = (hsa_region_t*) data;
     *ret = region;
     return HSA_STATUS_INFO_BREAK;
@@ -206,6 +207,7 @@ public:
   std::vector<int> GroupsPerDevice;
 
   hsa_agent_t agent;
+  hsa_region_t region;
 
   hsa_queue_t* commandQueue;
 
@@ -361,6 +363,14 @@ public:
     err = hsa_agent_get_info(agent, HSA_AGENT_INFO_WORKGROUP_MAX_SIZE, &workgroup_size);
     check(Querying the agent maximum queue size, err);
     //printf("The max workgroup size is %u.\n", (unsigned int) workgroup_size);
+
+    /*
+     * Init hsa memory region
+     */
+    region.handle=(uint64_t)-1;
+    hsa_agent_iterate_regions(agent, get_fine_grained_memory_region, &region);
+    err = (region.handle == (uint64_t)-1) ? HSA_STATUS_ERROR : HSA_STATUS_SUCCESS;
+    check(Finding a fine grained memory region, err);
 
 
     // Init the device info
@@ -851,13 +861,21 @@ void *__tgt_rtl_data_alloc(int device_id, int size){
   // HSA runtime
   hsa_status_t err;
 
+#if 0
   /*
    * Alloc system memory on host
    */
   void *ptr = malloc(size);
-  //FIXME: do we need unregister???
   err=hsa_memory_register(ptr, size);
   check(Registering hsa memory, err);
+#else
+  /*
+   * Alloc region memory on host
+   */
+  void *ptr;
+  err=hsa_memory_allocate(DeviceInfo.region, size, &ptr);
+  check(Allocating hsa memory, err);
+#endif
 
   DeviceInfo.addMemory(device_id,ptr,size);
   DP("System Alloc data %d bytes, (tgt:%016llx).\n", size, (long long unsigned)(Elf64_Addr)ptr);
@@ -877,7 +895,7 @@ int32_t __tgt_rtl_data_submit(int device_id, void *tgt_ptr, void *hst_ptr, int s
     return OFFLOAD_FAIL;
 
   /*
-   * Extra system memory copy on host
+   * Memory copy on host
    */
   memcpy(tgt_ptr,hst_ptr,size);
   return OFFLOAD_SUCCESS;
@@ -894,7 +912,7 @@ int32_t __tgt_rtl_data_retrieve(int device_id, void *hst_ptr, void *tgt_ptr, int
     return OFFLOAD_FAIL;
 
   /*
-   * Extra system memory copy on host
+   * Memory copy on host
    */
   memcpy(hst_ptr,tgt_ptr,size);
   return OFFLOAD_SUCCESS;
@@ -912,15 +930,21 @@ int32_t __tgt_rtl_data_delete(int device_id, void* tgt_ptr) {
 
   DeviceInfo.deleteMemory(device_id,tgt_ptr);
 
-  //need size?
-  //From HSA team we can put 0 there.
+#if 0
+  //Deregister, from HSA team we can put 0 there.
   err=hsa_memory_deregister(tgt_ptr, 0);
   check(Deregistering hsa memory, err);
-
   /*
    * Free system memory on host
    */
   free(tgt_ptr);
+#else
+  /*
+   * Free region memory on host
+   */
+  err = hsa_memory_free(tgt_ptr);
+  check(Freeing hsa memory, err);
+#endif
   return OFFLOAD_SUCCESS;
 }
 
