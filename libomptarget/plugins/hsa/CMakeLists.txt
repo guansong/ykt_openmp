@@ -28,7 +28,7 @@ if(LIBOMPTARGET_DEP_LIBELF_FOUND)
 
         include_directories(${LIBOMPTARGET_DEP_LIBHSA_INCLUDE_DIRS})
 
-        add_library(omptarget.rtl.hsa SHARED src/rtl.cpp src/elf_utils.cpp)
+        add_library(omptarget.rtl.hsa SHARED src/rtl.cpp src/elf_utils.c)
 
         # Install plugin under the lib destination folder.
         install(TARGETS omptarget.rtl.hsa LIBRARY DESTINATION "lib")

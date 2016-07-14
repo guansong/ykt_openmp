@@ -67,7 +67,7 @@ if(LIBOMPTARGET_HAVE_STD_CPP11_FLAG)
   libomptarget_say("Building offloading runtime library libomptarget.")
 
   # Enable support for C++11.
-  add_definitions(-std=c++11)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
   
   if(LIBOMPTARGET_ENABLE_WERROR AND LIBOMPTARGET_HAVE_WERROR_FLAG)
     add_definitions(-Werror)
